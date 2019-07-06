@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="customer" method="POST">
+    Contact Info: <input type="text" name="contactInfo" /> <br />
+    <input type="submit" value="Submit" />
+</form>
+<span th:text="${message}"></span>
+</body>
+</html>
