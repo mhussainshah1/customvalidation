@@ -141,28 +141,35 @@ Let’s create the ContactInfoValidator class that contains the actual validatio
 This class will obtain the value of the currently used type of contact info — email, phone, or website — which is set in a property called contactInfoType, then use it to retrieve the regular expression’s value from the database:
 
 ```java
+@Configuration
 public class ContactInfoValidator implements ConstraintValidator<ContactInfo, String> {
-     
-    private static final Logger LOG = Logger.getLogger(ContactInfoValidator.class);
- 
+
+    private static final Logger LOG = LogManager.getLogger(ContactInfoValidator.class);
+
     @Value("${contactInfoType}")
     private String expressionType;
- 
+
     private String pattern;
-  
+
     @Autowired
-    private ContactInfoExpressionRepository expressionRepository;
- 
+    private ContactInfoExpressionRepository contactInfoExpressionRepository;
+
     @Override
     public void initialize(ContactInfo contactInfo) {
         if (StringUtils.isEmptyOrWhitespace(expressionType)) {
             LOG.error("Contact info type missing!");
         } else {
-            pattern = expressionRepository.findById(expressionType)
-              .map(ContactInfoExpression::getPattern).get();
+            pattern = contactInfoExpressionRepository.findById(expressionType)
+                    .map(ContactInfoExpression::getPattern).get();
+        }
+
+        List<String> passwords = new ArrayList<>();
+        for (ContactInfoExpression password : contactInfoExpressionRepository.findAll()) {
+            System.out.println("invalid password = " + password.getType());
+            passwords.add(password.getType());
         }
     }
- 
+
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (!StringUtils.isEmptyOrWhitespace(pattern)) {
