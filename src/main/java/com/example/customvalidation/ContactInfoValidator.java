@@ -1,5 +1,7 @@
 package com.example.customvalidation;
 
+import com.example.customvalidation.entity.ContactInfoExpression;
+import com.example.customvalidation.entity.repository.ContactInfoExpressionRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.thymeleaf.util.StringUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Configuration
@@ -31,6 +35,12 @@ public class ContactInfoValidator implements ConstraintValidator<ContactInfo, St
         } else {
             pattern = contactInfoExpressionRepository.findById(expressionType)
                     .map(ContactInfoExpression::getPattern).get();
+        }
+
+        List<String> passwords = new ArrayList<>();
+        for (ContactInfoExpression password : contactInfoExpressionRepository.findAll()) {
+            System.out.println("invalid password = " + password.getType());
+            passwords.add(password.getType());
         }
     }
 

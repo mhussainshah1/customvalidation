@@ -1,4 +1,4 @@
-package com.example.customvalidation;
+package com.example.customvalidation.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +8,7 @@ import javax.persistence.Id;
 public class ContactInfoExpression {
 
     @Id
-    @Column(name="expression_type")
+    @Column(name = "expression_type")
     private String type;
 
     private String pattern;

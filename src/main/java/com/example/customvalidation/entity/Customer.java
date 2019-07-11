@@ -1,4 +1,6 @@
-package com.example.customvalidation;
+package com.example.customvalidation.entity;
+
+import com.example.customvalidation.ContactInfo;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
