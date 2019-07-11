@@ -32,7 +32,7 @@ For development, we will need the following dependencies:
 The latest versions of spring-boot-starter-thymeleaf, spring-boot-starter-data-jpa can be downloaded from Maven Central.
 
 ### 3. Custom Validation Annotation
-For our example, we will create a custom annotation called @ContactInfo that will validate a value against a regular expression retrieved from a database. We will then apply this validation on the contactInfo field of a POJO class called Customer.
+For our example, we will create a custom annotation called `@ContactInfo` that will validate a value against a regular expression retrieved from a database. We will then apply this validation on the contactInfo field of a POJO class called Customer.
 
 To retrieve regular expressions from a database, we will model these as a ContactInfoExpression entity class.
 
@@ -210,7 +210,7 @@ public class Customer {
 }
 ```
 ### 4. Spring Controller and HTML Form
-To test our validation annotation, we will create a Spring MVC request mapping that uses the @Valid annotation to trigger the validation of a Customer object:
+To test our validation annotation, we will create a Spring MVC request mapping that uses the `@Valid` annotation to trigger the validation of a Customer object:
 
 ```java
 @PostMapping("/customer")
