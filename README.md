@@ -1,4 +1,4 @@
-### Dynamic DTO Validation Config Retrieved from the Database
+## Dynamic DTO Validation Config Retrieved from the Database
 by baeldung PersistenceSpring Boot DTO
 
 
