@@ -14,12 +14,19 @@ For development, we will need the following dependencies:
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    <version>2.0.1.RELEASE</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-jpa</artifactId>
-    <version>2.0.1.RELEASE</version>
+</dependency>
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
 </dependency>
 ```
 The latest versions of spring-boot-starter-thymeleaf, spring-boot-starter-data-jpa can be downloaded from Maven Central.
@@ -37,7 +44,7 @@ Let’s create the Customer class with id and contactInfo fields:
 public class Customer {
  
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
  
     private String contactInfo;
@@ -64,30 +71,19 @@ Next, let’s add a repository interface based on Spring Data to manipulate the 
 
 ```java
 public interface ContactInfoExpressionRepository 
-  extends Repository<ContactInfoExpression, String> {
-  
-    Optional<ContactInfoExpression> findById(String id);
+  extends CrudRepository<ContactInfoExpression, String> {
 }
 ```
 ### 3.2. Database Setup
 For storing regular expressions, we will use an H2 in-memory database with the following persistence configuration:
 
-```java
-@EnableJpaRepositories("com.baeldung.dynamicvalidation.dao")
-@EntityScan("com.baeldung.dynamicvalidation.model")
-@Configuration
-public class PersistenceConfig {
- 
-    @Bean
-    public DataSource dataSource() {
-        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        EmbeddedDatabase db = builder.setType(EmbeddedDatabaseType.H2)
-          .addScript("schema-expressions.sql")
-          .addScript("data-expressions.sql")
-          .build();
-        return db;
-    }
-}
+```properties
+contactInfoType=email
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2
+spring.jpa.hibernate.ddl-auto=create
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.jpa.show-sql=true
 ```
 The two scripts mentioned are used for creating the schema and inserting the data into the contact_info_expression table:
 ```sql
@@ -106,6 +102,38 @@ insert into contact_info_expression values ('phone',
   '^([0-9]( |-)?)?(\(?[0-9]{3}\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$')
 insert into contact_info_expression values ('website',
   '^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$')
+```
+
+or use DataLoader
+
+```java
+@Component
+public class DataLoader implements CommandLineRunner {
+
+    @Autowired
+    ContactInfoExpressionRepository contactInfoExpressionRepository;
+
+    @Autowired
+    CustomerRepository customerRepository;
+
+    @Override
+    public void run(String... args) throws Exception {
+        String pattern = "[a-z0-9!#$%&*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
+        ContactInfoExpression email = new ContactInfoExpression("email", pattern);
+        contactInfoExpressionRepository.save(email);
+
+        pattern = "^([0-9]( |-)?)?(\\(?[0-9]{3}\\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$";
+        ContactInfoExpression phone = new ContactInfoExpression("phone", pattern);
+        contactInfoExpressionRepository.save(phone);
+
+        pattern = "^(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$";
+        ContactInfoExpression website = new ContactInfoExpression("website", pattern);
+        contactInfoExpressionRepository.save(website);
+
+        Customer customer1 = new Customer("m_hussain_shah@hotmail.com");
+        customerRepository.save(customer1);
+    }
+}
 ```
 ### 3.3. Creating the Custom Validator
 Let’s create the ContactInfoValidator class that contains the actual validation logic. Following Java Validation specification guidelines, the class implements the ConstraintValidator interface and overrides the isValid() method.
@@ -147,8 +175,10 @@ public class ContactInfoValidator implements ConstraintValidator<ContactInfo, St
 ```
 The contactInfoType property can be set in the application.properties file to one of the values email, phone or website:
 
-1
+```properties
 contactInfoType=email
+```
+
 #### 3.4. Creating the Custom Constraint Annotation
 And now, let’s create the annotation interface for our custom constraint:
 
