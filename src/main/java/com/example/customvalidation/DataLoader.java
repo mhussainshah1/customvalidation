@@ -32,7 +32,7 @@ public class DataLoader implements CommandLineRunner {
         contactInfoExpressionRepository.save(website);
 
         Customer customer1 = new Customer("m_hussain_shah@hotmail.com");
-        customerRepository.save(customer1);
+//        customerRepository.save(customer1);
     }
 }
 

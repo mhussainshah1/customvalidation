@@ -74,68 +74,8 @@ public interface ContactInfoExpressionRepository
   extends CrudRepository<ContactInfoExpression, String> {
 }
 ```
-### 3.2. Database Setup
-For storing regular expressions, we will use an H2 in-memory database with the following persistence configuration:
 
-```properties
-contactInfoType=email
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2
-spring.jpa.hibernate.ddl-auto=create
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.jpa.show-sql=true
-```
-The two scripts mentioned are used for creating the schema and inserting the data into the contact_info_expression table:
-```sql
-CREATE TABLE contact_info_expression(
-  expression_type varchar(50) not null,
-  pattern varchar(500) not null,
-  PRIMARY KEY ( expression_type )
-);
-```
-The data-expressions.sql script will add three records to represent the types email, phone, and website. These represent regular expressions for validating that value is a valid email address, a valid US phone number, or a valid URL:
-
-```sql
-insert into contact_info_expression values ('email',
-  '[a-z0-9!#$%&*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?')
-insert into contact_info_expression values ('phone',
-  '^([0-9]( |-)?)?(\(?[0-9]{3}\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$')
-insert into contact_info_expression values ('website',
-  '^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$')
-```
-
-or use DataLoader
-
-```java
-@Component
-public class DataLoader implements CommandLineRunner {
-
-    @Autowired
-    ContactInfoExpressionRepository contactInfoExpressionRepository;
-
-    @Autowired
-    CustomerRepository customerRepository;
-
-    @Override
-    public void run(String... args) throws Exception {
-        String pattern = "[a-z0-9!#$%&*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
-        ContactInfoExpression email = new ContactInfoExpression("email", pattern);
-        contactInfoExpressionRepository.save(email);
-
-        pattern = "^([0-9]( |-)?)?(\\(?[0-9]{3}\\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$";
-        ContactInfoExpression phone = new ContactInfoExpression("phone", pattern);
-        contactInfoExpressionRepository.save(phone);
-
-        pattern = "^(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$";
-        ContactInfoExpression website = new ContactInfoExpression("website", pattern);
-        contactInfoExpressionRepository.save(website);
-
-        Customer customer1 = new Customer("m_hussain_shah@hotmail.com");
-        customerRepository.save(customer1);
-    }
-}
-```
-### 3.3. Creating the Custom Validator
+### 3.2. Creating the Custom Validator
 Let’s create the ContactInfoValidator class that contains the actual validation logic. Following Java Validation specification guidelines, the class implements the ConstraintValidator interface and overrides the isValid() method.
 
 This class will obtain the value of the currently used type of contact info — email, phone, or website — which is set in a property called contactInfoType, then use it to retrieve the regular expression’s value from the database:
@@ -186,7 +126,7 @@ The contactInfoType property can be set in the application.properties file to on
 contactInfoType=email
 ```
 
-#### 3.4. Creating the Custom Constraint Annotation
+#### 3.3. Creating the Custom Constraint Annotation
 And now, let’s create the annotation interface for our custom constraint:
 
 ```java
@@ -202,7 +142,7 @@ public @interface ContactInfo {
 }
 ```
 
-#### 3.5. Applying the Custom Constraint
+#### 3.4. Applying the Custom Constraint
 Finally, let’s add validation annotations to the contactInfo field of our Customer class:
 
 ```java
@@ -215,6 +155,68 @@ public class Customer {
      
     // ...
 }
+```
+
+### 3.5. Database Setup
+For storing regular expressions, we will use an H2 in-memory database with the following persistence configuration:
+
+```properties
+contactInfoType=email
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2
+spring.jpa.hibernate.ddl-auto=create
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.jpa.show-sql=true
+```
+you can use DataLoader to create the schema and inserting the data into the contact_info_expression table
+
+```java
+@Component
+public class DataLoader implements CommandLineRunner {
+
+    @Autowired
+    ContactInfoExpressionRepository contactInfoExpressionRepository;
+
+    @Autowired
+    CustomerRepository customerRepository;
+
+    @Override
+    public void run(String... args) throws Exception {
+        String pattern = "[a-z0-9!#$%&*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
+        ContactInfoExpression email = new ContactInfoExpression("email", pattern);
+        contactInfoExpressionRepository.save(email);
+
+        pattern = "^([0-9]( |-)?)?(\\(?[0-9]{3}\\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$";
+        ContactInfoExpression phone = new ContactInfoExpression("phone", pattern);
+        contactInfoExpressionRepository.save(phone);
+
+        pattern = "^(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$";
+        ContactInfoExpression website = new ContactInfoExpression("website", pattern);
+        contactInfoExpressionRepository.save(website);
+
+        Customer customer1 = new Customer("m_hussain_shah@hotmail.com");
+        customerRepository.save(customer1);
+    }
+}
+```
+
+The data loader runs two scripts mentioned below:
+```sql
+CREATE TABLE contact_info_expression(
+  expression_type varchar(50) not null,
+  pattern varchar(500) not null,
+  PRIMARY KEY ( expression_type )
+);
+```
+The script will add three records to represent the types email, phone, and website. These represent regular expressions for validating that value is a valid email address, a valid US phone number, or a valid URL:
+
+```sql
+insert into contact_info_expression values ('email',
+  '[a-z0-9!#$%&*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?')
+insert into contact_info_expression values ('phone',
+  '^([0-9]( |-)?)?(\(?[0-9]{3}\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$')
+insert into contact_info_expression values ('website',
+  '^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$')
 ```
 ### 4. Spring Controller and HTML Form
 To test our validation annotation, we will create a Spring MVC request mapping that uses the `@Valid` annotation to trigger the validation of a Customer object:
@@ -249,5 +251,6 @@ public class DynamicValidationApp {
     }
 }
 ```
+
 ### 5. Conclusion
 In this example, we have shown how we can create a custom validation annotation that retrieves a regular expression dynamically from a database and uses it to validate the annotated field.
