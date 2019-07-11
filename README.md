@@ -2,12 +2,12 @@
 by baeldung PersistenceSpring Boot DTO
 
 
-###1. Overview
+### 1. Overview
 In this tutorial, we’re going to take a look at how we can create a custom validation annotation that uses a regular expression retrieved from a database to match against the field value.
 
 We will use Hibernate Validator as a base implementation.
 
-###2. Maven Dependencies
+### 2. Maven Dependencies
 For development, we will need the following dependencies:
 
 ```xml
@@ -24,12 +24,12 @@ For development, we will need the following dependencies:
 ```
 The latest versions of spring-boot-starter-thymeleaf, spring-boot-starter-data-jpa can be downloaded from Maven Central.
 
-3. Custom Validation Annotation
+### 3. Custom Validation Annotation
 For our example, we will create a custom annotation called @ContactInfo that will validate a value against a regular expression retrieved from a database. We will then apply this validation on the contactInfo field of a POJO class called Customer.
 
 To retrieve regular expressions from a database, we will model these as a ContactInfoExpression entity class.
 
-###3.1. Data Models and Repository
+### 3.1. Data Models and Repository
 Let’s create the Customer class with id and contactInfo fields:
 
 ```java
@@ -69,7 +69,7 @@ public interface ContactInfoExpressionRepository
     Optional<ContactInfoExpression> findById(String id);
 }
 ```
-###3.2. Database Setup
+### 3.2. Database Setup
 For storing regular expressions, we will use an H2 in-memory database with the following persistence configuration:
 
 ```java
@@ -107,7 +107,7 @@ insert into contact_info_expression values ('phone',
 insert into contact_info_expression values ('website',
   '^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$')
 ```
-###3.3. Creating the Custom Validator
+### 3.3. Creating the Custom Validator
 Let’s create the ContactInfoValidator class that contains the actual validation logic. Following Java Validation specification guidelines, the class implements the ConstraintValidator interface and overrides the isValid() method.
 
 This class will obtain the value of the currently used type of contact info — email, phone, or website — which is set in a property called contactInfoType, then use it to retrieve the regular expression’s value from the database:
@@ -149,7 +149,7 @@ The contactInfoType property can be set in the application.properties file to on
 
 1
 contactInfoType=email
-####3.4. Creating the Custom Constraint Annotation
+#### 3.4. Creating the Custom Constraint Annotation
 And now, let’s create the annotation interface for our custom constraint:
 
 ```java
@@ -165,7 +165,7 @@ public @interface ContactInfo {
 }
 ```
 
-####3.5. Applying the Custom Constraint
+#### 3.5. Applying the Custom Constraint
 Finally, let’s add validation annotations to the contactInfo field of our Customer class:
 
 ```java
@@ -179,7 +179,7 @@ public class Customer {
     // ...
 }
 ```
-###4. Spring Controller and HTML Form
+### 4. Spring Controller and HTML Form
 To test our validation annotation, we will create a Spring MVC request mapping that uses the @Valid annotation to trigger the validation of a Customer object:
 
 ```java
@@ -212,5 +212,5 @@ public class DynamicValidationApp {
     }
 }
 ```
-###5. Conclusion
+### 5. Conclusion
 In this example, we have shown how we can create a custom validation annotation that retrieves a regular expression dynamically from a database and uses it to validate the annotated field.
