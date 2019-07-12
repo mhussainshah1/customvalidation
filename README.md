@@ -75,6 +75,11 @@ public interface ContactInfoExpressionRepository
 }
 ```
 
+```java
+public interface CustomerRepository extends CrudRepository<Customer, Long> {
+}
+```
+
 ### 3.2. Creating the Custom Validator
 Let’s create the ContactInfoValidator class that contains the actual validation logic. Following Java Validation specification guidelines, the class implements the ConstraintValidator interface and overrides the isValid() method.
 
@@ -101,12 +106,6 @@ public class ContactInfoValidator implements ConstraintValidator<ContactInfo, St
         } else {
             pattern = contactInfoExpressionRepository.findById(expressionType)
                     .map(ContactInfoExpression::getPattern).get();
-        }
-
-        List<String> expressions = new ArrayList<>();
-        for (ContactInfoExpression expression : contactInfoExpressionRepository.findAll()) {
-             System.out.println("Expression = " + expression.getType());
-             expressions.add(expression.getType());
         }
     }
 
