@@ -37,11 +37,11 @@ public class ContactInfoValidator implements ConstraintValidator<ContactInfo, St
                     .map(ContactInfoExpression::getPattern).get();
         }
 
-        List<String> expressions = new ArrayList<>();
+        /*List<String> expressions = new ArrayList<>();
         for (ContactInfoExpression expression : contactInfoExpressionRepository.findAll()) {
             System.out.println("Expression = " + expression.getType());
             expressions.add(expression.getType());
-        }
+        }*/
     }
 
     @Override
