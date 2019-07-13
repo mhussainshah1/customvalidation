@@ -19,11 +19,10 @@ public class Customer {
     @NotNull
     private String contactInfo;
 
-    // standard constructor, getters, setters
     public Customer() {
     }
 
-    public Customer(String contactInfo) {
+    public Customer(@ContactInfo @NotNull String contactInfo) {
         this.contactInfo = contactInfo;
     }
 

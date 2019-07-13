@@ -31,7 +31,7 @@ public class DataLoader implements CommandLineRunner {
         ContactInfoExpression website = new ContactInfoExpression("website", pattern);
         contactInfoExpressionRepository.save(website);
 
-        Customer customer1 = new Customer("mhussainshah79@hotmail.com");
+        Customer customer1 = new Customer("a@a.com");
         customerRepository.save(customer1);
     }
 }

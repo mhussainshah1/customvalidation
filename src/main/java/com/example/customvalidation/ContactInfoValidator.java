@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
 import javax.validation.ConstraintValidator;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Configuration
+//@Component
 public class ContactInfoValidator implements ConstraintValidator<ContactInfo, String> {
 
     private static final Logger LOG = LogManager.getLogger(ContactInfoValidator.class);
@@ -33,11 +34,14 @@ public class ContactInfoValidator implements ConstraintValidator<ContactInfo, St
         if (StringUtils.isEmptyOrWhitespace(expressionType)) {
             LOG.error("Contact info type missing!");
         } else {
-            pattern = contactInfoExpressionRepository.findById(expressionType)
-                    .map(ContactInfoExpression::getPattern).get();
+            pattern = contactInfoExpressionRepository
+                    .findById(expressionType)
+                    .map(ContactInfoExpression::getPattern)
+                    .get();
         }
 
-        /*List<String> expressions = new ArrayList<>();
+  /*
+        List<String> expressions = new ArrayList<>();
         for (ContactInfoExpression expression : contactInfoExpressionRepository.findAll()) {
             System.out.println("Expression = " + expression.getType());
             expressions.add(expression.getType());
